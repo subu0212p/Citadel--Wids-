@@ -1,9 +1,9 @@
 # Citadel × WiDS – Agent-Based Market Simulation Project
 
 This repository documents a three-week learning and implementation project focused on
-financial markets, randomness, and market microstructure.  
-The project progresses from foundational concepts to a complete agent-based exchange
-simulation with analytics.
+financial markets, market microstructure, agent-based modeling, and reinforcement learning.
+The project progresses from foundational quantitative concepts to a complete
+multi-agent market simulator with behavioral analysis and benchmarking.
 
 ---
 
@@ -11,118 +11,149 @@ simulation with analytics.
 
 ### Work Done
 - Revised Python fundamentals relevant for quantitative finance
-- Implemented **Geometric Brownian Motion (GBM)** to model asset price evolution
+- Implemented **Geometric Brownian Motion (GBM)** for asset price simulation
 - Simulated multiple GBM price paths with identical parameters
 - Visualized:
-  - Price paths over time
-  - Histogram of final prices
-- Wrote a short reflection on randomness and financial risk
+  - Price trajectories
+  - Distribution of final prices
+- Wrote a reflection on randomness and financial risk
 
 ### Key Concepts Learned
-- Randomness plays a central role in financial markets
-- Even with fixed drift and volatility, realized price paths vary significantly
-- Risk is better understood as a **distribution of outcomes**, not a single forecast
-- Volatility controls dispersion and uncertainty
-- Losses are inherent possibilities, not anomalies
+- Financial markets are inherently stochastic
+- Identical model parameters can lead to widely different outcomes
+- Risk is a distribution, not a point estimate
+- Volatility controls uncertainty and dispersion
+- Losses are natural outcomes, not anomalies
 
 ---
 
 ## Week 1: Market Microstructure & System Design
 
 ### Work Done
-- Studied the architecture of a modern electronic market
-- Designed a modular **market simulator architecture**
-- Defined roles and interactions between:
+- Studied internal mechanics of electronic exchanges
+- Designed a modular **limit order book (LOB) based market architecture**
+- Defined clear interfaces between:
   - Agents
   - Market environment
   - Order book
-  - Trade logging and visualization
+  - Matching engine
+  - Analytics layer
 
 ### Architecture Overview
 - **Agents**
-  - Observe market state
+  - Observe partial market state
   - Decide actions
   - Submit orders
 - **Market Environment**
   - Maintains simulation clock
-  - Routes orders
-  - Tracks market state
+  - Routes agent orders
 - **Order Book**
-  - Maintains bids and asks
-  - Price–time (FIFO) priority
-  - Matching logic
-- **Trade Logger & Analytics**
-  - Records executed trades
-  - Enables spread, depth, and tape visualization
+  - Maintains bid and ask sides
+  - Enforces price–time (FIFO) priority
+- **Matching Engine**
+  - Executes trades and handles partial fills
+- **Analytics**
+  - Trade tape, spreads, depth, and mid-price tracking
 
 ### Key Concepts Learned
-- Market microstructure fundamentals
-- Price–time priority and FIFO matching
-- Difference between liquidity providers and takers
-- Role of randomness in order arrivals
-- Separation of concerns in system design
+- Order-driven market mechanics
+- Liquidity provision vs liquidity consumption
+- Bid–ask spread formation
+- Event-driven simulation
+- Importance of modular system design
 
 ---
 
-## Week 2: Agent-Based Exchange Implementation
+## Week 2: Agent-Based Exchange & Emergent Market Dynamics
 
 ### Work Done
-Implemented a complete working exchange simulator in Python:
+- Implemented a complete agent-based market simulator
+- Added heterogeneous agents interacting through a shared order book
 
-#### Agents
-- **NoiseAgent**
-  - Submits random market orders
-- **MomentumAgent**
-  - Trades based on recent price trends
-- **MarketMakerAgent**
-  - Posts two-sided limit quotes around mid-price
-- **Base Agent Interface**
-  - Enforced via abstraction for extensibility
+### Agents Implemented
+- **Noise Traders**
+  - Random buy/sell actions
+  - Primary source of stochastic order flow
+- **Momentum Traders**
+  - Trend-following agents using moving averages
+  - Create feedback loops and instability
+- **Market Makers**
+  - Two-sided limit quoting
+  - Spread capture with inventory control
 
-#### Engine
-- **Order**
-  - Represents buy/sell, market/limit orders
-- **OrderBook**
-  - Maintains bid and ask heaps
-  - Supports best bid/ask retrieval
-- **MatchingEngine**
-  - Matches orders using price–time priority
-  - Records executed trades
-- **EventLoop**
-  - Schedules and processes orders in timestamp order
+### Experiments & Analysis
+- Order book heatmaps to visualize liquidity concentration
+- Spread and mid-price evolution
+- Volatility clustering analysis
+- Return distribution analysis showing fat tails
+- Scenario-based simulations:
+  - Noise-only market
+  - Noise + market makers
+  - Noise + momentum traders
 
-#### Analytics
-- **TradeTape**
-  - Stores executed trades
-- **SnapshotRecorder**
-  - Records best bid, best ask, mid-price, and spread
-- **Metrics**
-  - VWAP (Volume Weighted Average Price)
-  - Average spread
-  - Volatility using log returns
-
-#### Testing & Simulation
-- Unit-style test for matching engine correctness
-- Full simulation runner with:
-  - Multiple agents
-  - Random order arrivals
-  - Trade execution
-  - VWAP computation
+### Key Observations
+- Market makers stabilize spreads and prices
+- Momentum traders amplify volatility and crashes
+- Stylized facts emerge without being hard-coded
 
 ---
 
-## Key Learning Outcomes
+## Week 3: Reinforcement Learning, Behavioral Analysis & Benchmarking
 
-By the end of the project, the following concepts were understood and implemented:
+### Work Done
+- Integrated a **Reinforcement Learning (RL) trader** using PPO
+- Built a custom **Gymnasium-compatible trading environment**
+- Designed a **risk-aware reward function** incorporating PnL and penalties
+- Trained and validated learning behavior
+- Performed systematic analysis of agent behavior and market outcomes
 
-- Agent-based modeling of financial markets
-- Order-driven market mechanics
-- Matching engines and order books
-- Market vs limit orders
-- Liquidity provision and consumption
-- Event-driven simulation
-- Probabilistic understanding of risk
-- Modular and extensible system design
+### Reinforcement Learning Setup
+- **State:** Market features (mid-price, spread) + agent inventory
+- **Actions:** Buy, Sell, Hold (discrete)
+- **Reward:** Incremental portfolio value with risk penalties
+- **Algorithm:** PPO (Stable-Baselines3)
+
+### Behavioral & Statistical Analysis
+- **Herding Detection**
+  - Correlation analysis of agent positions
+  - Identification of synchronization during stress
+- **Stylized Facts Validation**
+  - Volatility clustering
+  - Fat-tailed return distributions
+
+### Benchmarking & Evaluation
+- Compared RL agent performance against:
+  - Buy & Hold strategy
+  - Random trading agent
+- Metrics used:
+  - Sharpe Ratio
+  - Maximum Drawdown
+  - Equity curves and drawdown plots
+
+### Visualization
+- Interactive dashboards using Plotly
+- Order book heatmaps
+- Equity curve and PnL distribution plots
+
+### Key Insights
+- Learning is highly sensitive to reward design
+- Apparent profitability without benchmarks is misleading
+- Herding emerges as a collective phenomenon, not individual behavior
+- Risk-adjusted metrics are essential for evaluating trading strategies
 
 ---
 
+## Final Outcome
+
+By the end of the project, the following were achieved:
+
+- A fully functional agent-based market simulator
+- Reinforcement learning integrated with market microstructure
+- Endogenous emergence of volatility, crashes, and herding
+- Behavioral validation and benchmarking against baseline strategies
+- A complete experimental and reporting pipeline
+
+This project demonstrates how complex market behavior can emerge from
+simple rules, constraints, and agent interactions—without being explicitly programmed.
+
+---
